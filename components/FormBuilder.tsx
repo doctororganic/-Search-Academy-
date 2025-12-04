@@ -15,8 +15,7 @@ interface FormBuilderProps {
 const STEPS = [
   { id: 1, key: 'personal', title: { en: 'Personal', ar: 'الشخصية' }, icon: User },
   { id: 2, key: 'metrics', title: { en: 'Body Metrics', ar: 'القياسات' }, icon: Scale },
-  { id: 3, key: 'health', title: { en: 'Health', ar: 'الصحة' }, icon: Heart },
-  { id: 4, key: 'lifestyle', title: { en: 'Lifestyle', ar: 'نمط الحياة' }, icon: Activity },
+  { id: 3, key: 'lifestyle', title: { en: 'Lifestyle', ar: 'نمط الحياة' }, icon: Activity },
 ];
 
 export default function FormBuilder({ language, onGenerate, isGenerating }: FormBuilderProps) {
@@ -28,7 +27,7 @@ export default function FormBuilder({ language, onGenerate, isGenerating }: Form
     region: 'Saudi Arabia',
     weight_kg: '',
     height_cm: '',
-    diseases: [] as string[],
+    diseases: [] as string[], // Kept in state for compatibility but not shown in UI
     activity_level: 'Moderate',
     goal: 'Weight Loss',
     diet_preference: 'Standard',
@@ -38,18 +37,6 @@ export default function FormBuilder({ language, onGenerate, isGenerating }: Form
 
   const handleChange = (key: string, value: any) => {
     setFormData(prev => ({ ...prev, [key]: value }));
-  };
-
-  const toggleDisease = (disease: string) => {
-    setFormData(prev => {
-      const exists = prev.diseases.includes(disease);
-      return {
-        ...prev,
-        diseases: exists 
-          ? prev.diseases.filter(d => d !== disease)
-          : [...prev.diseases, disease]
-      };
-    });
   };
 
   const nextStep = () => setStep(prev => Math.min(prev + 1, STEPS.length));
@@ -200,35 +187,6 @@ export default function FormBuilder({ language, onGenerate, isGenerating }: Form
           </div>
         );
       case 3:
-        return (
-          <div className="space-y-6 animate-fadeIn">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
-                {language === 'en' ? 'Do you have any medical conditions?' : 'هل لديك أي حالات طبية؟'}
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {['Diabetes', 'Hypertension', 'Celiac', 'IBS/Gut Health'].map(disease => (
-                  <div 
-                    key={disease}
-                    onClick={() => toggleDisease(disease)}
-                    className={`
-                      p-4 rounded-xl border cursor-pointer transition-all flex items-center gap-3
-                      ${formData.diseases.includes(disease) 
-                        ? 'bg-red-50 dark:bg-red-900/20 border-red-500 text-red-700 dark:text-red-300' 
-                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-red-300'}
-                    `}
-                  >
-                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${formData.diseases.includes(disease) ? 'bg-red-500 border-red-500 text-white' : 'border-slate-300'}`}>
-                      {formData.diseases.includes(disease) && <Check size={12} />}
-                    </div>
-                    <span className="text-sm font-medium">{disease}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      case 4:
         return (
           <div className="space-y-6 animate-fadeIn">
             <div>

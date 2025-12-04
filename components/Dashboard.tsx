@@ -1,7 +1,14 @@
+
 import React, { useState, useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { Activity, Utensils, Dumbbell, Calendar, Download, TrendingUp, ChefHat } from 'lucide-react';
-import { Language, PlanData } from '../types';
+import { Activity, Utensils, Dumbbell, Calendar, Download, ShoppingCart, TrendingUp, CheckCircle, Circle, ChefHat, Lock, Info } from 'lucide-react';
+import * as ReactWindow from 'react-window';
+import ShoppingList from './ShoppingList';
+import ProgressTracker from './ProgressTracker';
+import { Language, PlanData, Exercise } from '../types';
+
+// Robust import for FixedSizeList
+const List = (ReactWindow as any).FixedSizeList || (ReactWindow as any).default?.FixedSizeList || ReactWindow;
 
 interface DashboardProps {
   data: PlanData;
@@ -27,7 +34,7 @@ export default function Dashboard({ data, language }: DashboardProps) {
   return (
     <div className="animate-fadeIn">
       {/* Header Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[
           { label: language === 'en' ? 'Calories' : 'سعرات', value: `${macros.calories} kcal`, icon: Activity, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
           { label: language === 'en' ? 'Protein' : 'بروتين', value: `${macros.protein}g`, icon: Dumbbell, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
@@ -44,6 +51,21 @@ export default function Dashboard({ data, language }: DashboardProps) {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Calculation Explanation Box (Harris-Benedict) */}
+      <div className="mb-8 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800 p-4 rounded-xl flex items-start gap-3">
+        <Info className="text-blue-500 flex-shrink-0 mt-1" size={20} />
+        <div>
+          <h4 className="font-bold text-blue-800 dark:text-blue-200 text-sm mb-1">
+            {language === 'en' ? 'Calculation Methodology' : 'منهجية الحساب'}
+          </h4>
+          <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+            {language === 'en' 
+              ? 'We use the Harris-Benedict equation to estimate your Basal Metabolic Rate (BMR) based on your weight, height, age, and gender. This is multiplied by your activity factor to determine your Total Daily Energy Expenditure (TDEE).' 
+              : 'نستخدم معادلة هاريس-بينيديكت لتقدير معدل الأيض الأساسي (BMR) بناءً على وزنك وطولك وعمرك وجنسك. يتم ضرب هذا في عامل نشاطك لتحديد إجمالي استهلاك الطاقة اليومي (TDEE).'}
+          </p>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -103,7 +125,6 @@ export default function Dashboard({ data, language }: DashboardProps) {
                    ? 'Based on your activity level and goals, a balanced diet focusing on lean proteins and complex carbohydrates is recommended. Ensure adequate hydration.'
                    : 'بناءً على مستوى نشاطك وأهدافك، يوصى بنظام غذائي متوازن يركز على البروتينات الخالية من الدهون والكربوهيدرات المعقدة. تأكد من شرب كمية كافية من الماء.')}
                </p>
-               {/* Updated with Pale Yellow Theme */}
                <div className="bg-pale dark:bg-pale-dark/20 border border-yellow-200 dark:border-yellow-900 p-4 rounded-lg text-slate-800 dark:text-slate-200 text-sm">
                  <strong className="block mb-1 text-accent">{language === 'en' ? 'Pro Tip:' : 'نصيحة احترافية:'}</strong>
                  {language === 'en' ? 'Try to consume protein within 30 minutes of exercise for optimal recovery.' : 'حاول تناول البروتين في غضون 30 دقيقة من التمرين للتعافي الأمثل.'}
@@ -148,7 +169,6 @@ export default function Dashboard({ data, language }: DashboardProps) {
                       </p>
                     </div>
                     
-                    {/* Placeholder for preparation if available in data, otherwise generic text */}
                     <div className="bg-white dark:bg-slate-800 p-3 rounded-lg text-sm border border-slate-100 dark:border-slate-700">
                        <strong className="block text-slate-700 dark:text-slate-300 mb-1 text-xs uppercase tracking-wide opacity-70">
                         {language === 'en' ? 'Preparation' : 'التحضير'}
@@ -163,6 +183,29 @@ export default function Dashboard({ data, language }: DashboardProps) {
                 </div>
               ))}
             </div>
+
+            {/* Pro Plan Subscription Box */}
+            <div className="mt-8 p-6 rounded-2xl border-2 border-dashed border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/10 flex flex-col md:flex-row items-center justify-between gap-4 group hover:border-blue-500 dark:hover:border-blue-500 transition-colors">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full text-blue-600 dark:text-blue-400">
+                  <Lock size={24} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg text-slate-800 dark:text-white">
+                    {language === 'en' ? 'Unlock Full Month Plan' : 'احصل على الخطة الشهرية الكاملة'}
+                  </h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
+                    {language === 'en' 
+                      ? 'Get a detailed 30-day schedule with shopping lists and recipes by subscribing to our Pro Plan.' 
+                      : 'احصل على جدول مفصل لمدة 30 يومًا مع قوائم التسوق والوصفات من خلال الاشتراك في الخطة الاحترافية.'}
+                  </p>
+                </div>
+              </div>
+              <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-200 dark:shadow-none transition-all whitespace-nowrap">
+                {language === 'en' ? 'Upgrade to Pro' : 'الترقية للبرو'}
+              </button>
+            </div>
+
           </div>
         )}
       </div>
